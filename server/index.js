@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/", indexRouter);
 app.use("/users", userRouter);
-app.use("/room", decode, chatRouter);
+app.use("/chat", decode, chatRouter);
 app.use("/delete", deleteRouter);
 
 /** catch 404 and forward to error handler */
