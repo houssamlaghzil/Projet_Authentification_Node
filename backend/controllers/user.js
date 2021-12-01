@@ -44,6 +44,19 @@ export default {
         return res.status(500).json({ success: false, error: error })
       }
     },
+    onUpdateUser: async (req, res) => {
+      try {
+        const salt = await bcrypt.genSalt(10);
+        const newUser = req.body
+        if(req.body.password)
+          newUser.password = await bcrypt.hash(req.body.password, salt);
+
+        const user = await UserModel.updateUserById(req.params.id, newUser);
+        return res.status(200).json({ success: true, user });
+      } catch (error) {
+        return res.status(500).json({ success: false, error: error })
+      }
+    },
     onDeleteUserById: async (req, res) => {
       try {
         const user = await UserModel.deleteByUserById(req.params.id);
