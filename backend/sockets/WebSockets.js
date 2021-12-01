@@ -10,23 +10,23 @@ class WebSockets {
           userId: userId,
         });
       });
-      client.on("subscribe", (room, otherUserId = "") => {
-        this.subscribeOtherUser(room, otherUserId);
-        client.join(room);
+      client.on("subscribe", (chat, otherUserId = "") => {
+        this.subscribeOtherUser(chat, otherUserId);
+        client.join(chat);
       });
-      client.on("unsubscribe", (room) => {
-        client.leave(room);
+      client.on("unsubscribe", (chat) => {
+        client.leave(chat);
       });
     }
   
-    subscribeOtherUser(room, otherUserId) {
+    subscribeOtherUser(chat, otherUserId) {
       const userSockets = this.users.filter(
         (user) => user.userId === otherUserId
       );
       userSockets.map((userInfo) => {
         const socketConn = global.io.sockets.connected(userInfo.socketId);
         if (socketConn) {
-          socketConn.join(room);
+          socketConn.join(chat);
         }
       });
     }
