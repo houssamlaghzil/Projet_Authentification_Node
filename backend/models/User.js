@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
-import jwt from 'jsonwebtoken';
 
 export const USER_TYPES = {
   MEMBER: "member",
@@ -13,10 +12,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: () => uuidv4().replace(/\-/g, ""),
     },
-    pseudo: String,
-    email: String,
-    password: String,
-    type: String,
+    pseudo: { type: String, required: true },
+    email: { type: String, required: true },
+    password: { type: String, required: true },
+    type: { type: String, required: true },
   },
   {
     timestamps: true,
@@ -61,6 +60,24 @@ userSchema.statics.getUserByPseudo = async function (pseudo) {
   try {
     const user = await this.findOne({ pseudo: pseudo });
     if (!user) throw ({ error: 'No user with this pseudo found' });
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+userSchema.statics.updateUserById = async function (id, newUser) {
+  try {
+    const userId = { _id: id };
+
+    await this.countDocuments(userId); // 0
+
+    const user = await this.findOneAndUpdate(userId, newUser, {
+      new: true,
+      upsert: false // Make this update into an upsert
+    });
+
+    if (!user) throw ({ error: 'No user with this id found' });
     return user;
   } catch (error) {
     throw error;
