@@ -12,8 +12,8 @@ export const encode = async (req, res, next) => {
 
     const validPassword = await bcrypt.compare(password, user.password);
 
-      if (!validPassword)
-          return res.status(400).send("Invalid email or password");
+    if (!validPassword)
+        return res.status(400).send("Invalid email or password");
 
     const payload = {
       userId: user._id,
@@ -21,8 +21,14 @@ export const encode = async (req, res, next) => {
     };
 
     const authToken = jwt.sign(payload, process.env.JWTPRIVATEKEY);
+
     console.log('Auth', authToken);
+
+    delete user.password
+
     req.authToken = authToken;
+    req.user = user
+    
     next();
   } catch (error) {
     console.log('Error : ', error);
@@ -39,6 +45,7 @@ export const decode = (req, res, next) => {
     const decoded = jwt.verify(accessToken, process.env.JWTPRIVATEKEY);
     req.userId = decoded.userId;
     req.userType = decoded.type;
+
     return next();
   } catch (error) {
 

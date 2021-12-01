@@ -13,6 +13,7 @@ router
       .json({
         success: true,
         authorization: req.authToken,
+        user: req.user
       });
    })
   .post('/register', users.onCreateUser)
