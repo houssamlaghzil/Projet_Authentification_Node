@@ -6,7 +6,7 @@ const router = express.Router();
 
 router
   .get('/', chat.getRecentConversation)
-  .get('/:roomId', chat.getConversationByRoomId)
+  .get('/:roomId', chat.getConversationByChatId)
   .post('/initiate', chat.initiate)
   .post('/:roomId/message', chat.postMessage)
 
