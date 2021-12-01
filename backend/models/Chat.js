@@ -46,4 +46,13 @@ chatSchema.statics.initiateChat = async function (
   }
 }
 
+chatSchema.statics.getChatById = async function (id) {
+    try {
+      const chat = await this.findOne({ _id: id });
+      return chat;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 export default mongoose.model("Chat", chatSchema);
