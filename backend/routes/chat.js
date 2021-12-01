@@ -9,6 +9,5 @@ router
   .get('/:roomId', chat.getConversationByRoomId)
   .post('/initiate', chat.initiate)
   .post('/:roomId/message', chat.postMessage)
-  .put('/:roomId/mark-read', chat.markConversationReadByRoomId)
 
 export default router;

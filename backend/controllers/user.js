@@ -48,6 +48,7 @@ export default {
       try {
         const salt = await bcrypt.genSalt(10);
         const newUser = req.body
+        
         if(req.body.password)
           newUser.password = await bcrypt.hash(req.body.password, salt);
 
