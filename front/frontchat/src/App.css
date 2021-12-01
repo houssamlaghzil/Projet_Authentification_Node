@@ -1,0 +1,7 @@
+@import url("https://cdn.jsdelivr.net/npm/halfmoon@1.1.0/css/halfmoon.min.css");
+
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

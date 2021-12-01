@@ -53,6 +53,15 @@ chatSchema.statics.getChatById = async function (id) {
     } catch (error) {
       throw error;
     }
-  }
+}
+
+chatSchema.statics.getChats = async function () {
+    try {
+      const chats = await this.find();
+      return chats;
+    } catch (error) {
+      throw error;
+    }
+}  
 
 export default mongoose.model("Chat", chatSchema);
