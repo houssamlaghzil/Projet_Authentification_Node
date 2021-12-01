@@ -14,6 +14,9 @@ import deleteRouter from "../routes/delete.js";
 
 // middlewares
 import { decode } from '../middlewares/jwt.js'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app = express();
 

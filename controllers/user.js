@@ -7,16 +7,27 @@ import bcrypt from 'bcrypt'
 
 export default {
     onGetAllUsers: async (req, res) => { 
-      console.log('Get all users');
+      try {
+        const users = await UserModel.getUsers();
+        return res.status(200).json({ success: true, users });
+      } catch (error) {
+        return res.status(500).json({ success: false, error: error })
+      }
     },
-    onGetUserById: async (req, res) => { },
+    onGetUserById: async (req, res) => {
+      try {
+        const user = await UserModel.getUserById(req.params.id);
+        return res.status(200).json({ success: true, user });
+      } catch (error) {
+        return res.status(500).json({ success: false, error: error })
+      }
+     },
     onCreateUser: async (req, res) => {
       try {
         const validation = makeValidation(types => ({
           payload: req.body,
           checks: {
-            firstName: { type: types.string },
-            lastName: { type: types.string },
+            pseudo: { type: types.string },
             email: { type: types.string },
             password: { type: types.string },
             type: { type: types.enum, options: { enum: USER_TYPES } },
@@ -25,13 +36,23 @@ export default {
         if (!validation.success) return res.status(400).json(validation);
   
         const salt = await bcrypt.genSalt(10);
-        const { firstName, lastName, email, password, type } = req.body;
+        const { pseudo, email, password, type } = req.body;
         const hashedPassword = await bcrypt.hash(password, salt);
-        const user = await UserModel.createUser(firstName, lastName, email, hashedPassword, type);
+        const user = await UserModel.createUser(pseudo, email, hashedPassword, type);
         return res.status(200).json({ success: true, user });
       } catch (error) {
         return res.status(500).json({ success: false, error: error })
       }
     },
-    onDeleteUserById: async (req, res) => { },
+    onDeleteUserById: async (req, res) => {
+      try {
+        const user = await UserModel.deleteByUserById(req.params.id);
+        return res.status(200).json({ 
+          success: true, 
+          message: `Deleted a count of ${user.deletedCount} user.` 
+        });
+      } catch (error) {
+        return res.status(500).json({ success: false, error: error })
+      }
+    },
   }

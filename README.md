@@ -10,7 +10,7 @@ Créer vos identifiants et base de donnée Admin avec Mongosh :
 ```
 mongosh
 
-db.use admin
+use admin
 
 db.createUser( { user: "userName", pwd: passwordPrompt(), roles: [ { role: "userAdminAnyDatabase", db: "admin" }, { role: "readWriteAnyDatabase", db: "admin" } ] } )
 
