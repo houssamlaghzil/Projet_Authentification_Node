@@ -14,6 +14,8 @@ import deleteRouter from "../routes/delete.js";
 
 // middlewares
 import { decode } from '../middlewares/jwt.js'
+import { authAdmin } from '../middlewares/auth.js'
+
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -29,7 +31,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/", indexRouter);
-app.use("/users", userRouter);
+app.use("/users", authAdmin, userRouter);
 app.use("/chat", decode, chatRouter);
 app.use("/delete", decode, deleteRouter);
 
