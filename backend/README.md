@@ -17,7 +17,7 @@ db.createUser( { user: "userName", pwd: passwordPrompt(), roles: [ { role: "user
 ```
 Lancer la base de donnée via Robot3T ou Mongosh (Mongo Shell)
 ```
-mongosh --port 27017  --authenticationDatabase \ "admin" -u "userName" -p
+mongosh "mongodb://localhost:27017/admin" --username userName
 
 ```
 
