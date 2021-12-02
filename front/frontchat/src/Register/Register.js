@@ -1,7 +1,34 @@
-import React from "react";
-import {Link} from "react-router-dom";
+import React, {useState} from "react";
+import {Link, useHistory} from "react-router-dom";
+import axios from "axios";
 
 export default function Register() {
+    const history = useHistory();
+
+    const API_URL = "http://localhost:3000";
+
+    const [email, setEmail] = useState("");
+    const [name, setName] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        axios.post(API_URL+'/register', {
+            pseudo: name,
+            email: email,
+            password: password,
+            type: "member"
+        })
+            .then(function (response) {
+                console.log(response);
+                history.push('/login');
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
     return(
         <>
             <head>
@@ -16,20 +43,21 @@ export default function Register() {
                 <div className="sticky-alerts"/>
 
                 <div className="content-wrapper">
-                    <form action="register" method="post" className="form-inline w-400 mw-full">
+
+                    <form onSubmit={handleSubmit} method="post" className="form-inline w-400 mw-full">
                         <div className="form-group">
-                            <input type="email" className="form-control" placeholder="Email" id="email" required="required" />
+                            <input type="email" value={email}
+                                   onChange={(e) => setEmail(e.target.value)} className="form-control" placeholder="Email" id="email" required="required" />
                         </div>
                         <div className="form-group">
-                            <input type="text" className="form-control" placeholder="Username" id="username" required="required" />
+                            <input type="text" value={name}
+                                   onChange={(e) => setName(e.target.value)} className="form-control" placeholder="Username" id="username" required="required" />
                         </div>
                         <div className="form-group">
-                            <input type="password" className="form-control" placeholder="Password" id="password" required="required" />
+                            <input type="password" value={password}
+                                   onChange={(e) => setPassword(e.target.value)} className="form-control" placeholder="Password" id="password" required="required" />
                         </div>
-                        <div className="form-group">
-                            <input type="password" className="form-control" placeholder="Confirm your password" id="password_confirm" required="required" />
-                        </div>
-                        <input type="hidden" id="user_type" />
+
                         <div className="form-group mb-0">
                             <div className="custom-control">
                                 <Link to="login" className="btn" type="button">Back to login</Link>
