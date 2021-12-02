@@ -1,6 +1,10 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
+
+import logo from '../logo.svg';
+
+const halfmoon = require("halfmoon");
 
 export default function Register() {
     const history = useHistory();
@@ -25,9 +29,41 @@ export default function Register() {
                 history.push('/login');
             })
             .catch(function (error) {
-                console.log(error);
+                if (error.response === undefined) {
+                    halfmoon.initStickyAlert({
+                        content: "An error occurred. Please try again later",
+                        title: "Internal error",
+                        alertType: "alert-danger",
+                        hasDismissButton: true,
+                        timeShown: 5000
+                    });
+                }
+                else {
+                    if (error.response.status === 400) {
+                        halfmoon.initStickyAlert({
+                            content: "Try entering your credentials again.",
+                            title: "Incorrect credentials",
+                            alertType: "alert-secondary",
+                            hasDismissButton: true,
+                            timeShown: 5000
+                        });
+                    }
+                    else {
+                        halfmoon.initStickyAlert({
+                            content: "An error occurred. Please try again later",
+                            title: "Internal error",
+                            alertType: "alert-danger",
+                            hasDismissButton: true,
+                            timeShown: 5000
+                        });
+                    }
+                }
             });
     }
+
+    useEffect(() => {
+        halfmoon.onDOMContentLoaded();
+    });
 
     return(
         <>
@@ -43,6 +79,8 @@ export default function Register() {
                 <div className="sticky-alerts"/>
 
                 <div className="content-wrapper">
+                    <div>
+                    <img id="logo" src={logo} alt="Logo" />
 
                     <form onSubmit={handleSubmit} method="post" className="form-inline w-400 mw-full">
                         <div className="form-group">
@@ -65,6 +103,7 @@ export default function Register() {
                             <input type="submit" className="btn btn-primary ml-auto" value="Register" />
                         </div>
                     </form>
+                </div>
                 </div>
 
             </div>
