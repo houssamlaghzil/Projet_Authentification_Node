@@ -67,6 +67,7 @@ export default {
   getConversationByChatId: async (req, res) => {
     try {
       const { chatId } = req.params;
+      console.log("ChatId : ", req.params);
       const chat = await ChatModel.getChatById(chatId)
 
       if (!chat) {

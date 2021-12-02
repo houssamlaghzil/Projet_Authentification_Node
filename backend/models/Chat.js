@@ -48,7 +48,10 @@ chatSchema.statics.initiateChat = async function (
 
 chatSchema.statics.getChatById = async function (id) {
     try {
+
+      console.log("ID : ", id);
       const chat = await this.findOne({ _id: id });
+      console.log("Chat : ", chat);
       return chat;
     } catch (error) {
       throw error;

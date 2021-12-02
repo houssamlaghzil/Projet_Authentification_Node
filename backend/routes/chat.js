@@ -6,8 +6,8 @@ const router = express.Router();
 
 router
   .get('/', chat.getRecentConversation)
-  .get('/:roomId', chat.getConversationByChatId)
+  .get('/:chatId', chat.getConversationByChatId)
   .post('/initiate', chat.initiate)
-  .post('/:roomId/message', chat.postMessage)
+  .post('/:chatId/message', chat.postMessage)
 
 export default router;
