@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
 import logo from "../logo.svg";
+import socketIOClient from "socket.io-client";
 
 const halfmoon = require("halfmoon");
 
@@ -21,12 +22,20 @@ export default function Login() {
             password: password,
         })
             .then(function (response) {
-                let userData = response.data.user;
-                localStorage.setItem("userAuthorization", response.data.authorization);
-                localStorage.setItem("userId", userData._id);
-                localStorage.setItem("userName", userData.pseudo);
-                localStorage.setItem("userType", userData.type);
-                localStorage.setItem("userEmail", userData.email);
+                let user = response.data.user;
+
+                const socket = socketIOClient("http://localhost:3002");         
+                socket.emit("identity", user._id);
+
+                const userDatas = {
+                    userId: user._id,
+                    pseudo: user.pseudo,
+                    email: user.email,
+                    role: user.type,
+                    authorization: response.data.authorization
+                }
+
+                localStorage.setItem("userDatas", JSON.stringify(userDatas));
 
                 let auth = localStorage.getItem("userAuthorization");
                 axios.post(API_URL+'/chat/initiate', {

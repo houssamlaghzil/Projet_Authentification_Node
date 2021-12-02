@@ -60,11 +60,18 @@ app.use('*', (req, res) => {
 const server = http.createServer(app);
 
 /** Create socketio */
-const socketio = new Server(server);
+const socketio = new Server(server, {
+  cors: {
+    origin: "http://localhost:3001",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
+});
 
 global.io = socketio.listen(server);
 
-WebSockets.connection(global.io)
+global.io.on('connection', WebSockets.connection)
 
 /** Listen on provided port, on all network interfaces. */
 server.listen(port);
