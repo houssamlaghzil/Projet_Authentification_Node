@@ -32,7 +32,7 @@ export default {
   },
   postMessage: async (req, res) => {
     try {
-      const { roomId } = req.params;
+      const { chatId } = req.params;
       const validation = makeValidation(types => ({
         payload: req.body,
         checks: {
@@ -47,9 +47,9 @@ export default {
       };
       
       const currentLoggedUser = req.userId;
-      const post = await MessageModel.createPostInChat(roomId, messagePayload, currentLoggedUser);
+      const post = await MessageModel.createPostInChat(chatId, messagePayload, currentLoggedUser);
 
-      global.io.sockets.in(roomId).emit('new message', { message: post });
+      global.io.sockets.in(chatId).emit('new message', { message: post });
 
       return res.status(200).json({ success: true, post });
     } catch (error) {

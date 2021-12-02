@@ -13,7 +13,6 @@ import "../config/mongo.js";
 import indexRouter from "../routes/index.js";
 import userRouter from "../routes/user.js";
 import chatRouter from "../routes/chat.js";
-import deleteRouter from "../routes/delete.js";
 
 // middlewares
 import { decode } from '../middlewares/jwt.js'
@@ -26,7 +25,7 @@ dotenv.config()
 const app = express();
 
 /** Get port from environment and store in Express. */
-const port = process.env.PORT || "3000";
+const port = process.env.PORT || "3002";
 app.set("port", port);
 
 app.use(function(req, res, next) {
@@ -42,7 +41,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/", indexRouter);
 app.use("/users", authAdmin, userRouter);
 app.use("/chat", decode, chatRouter);
-app.use("/delete", decode, deleteRouter);
 
 /** catch 404 and forward to error handler */
 app.use('*', (req, res) => {
@@ -59,7 +57,8 @@ const server = http.createServer(app);
 const socketio = new Server(server);
 
 global.io = socketio.listen(server);
-global.io.on('connection', WebSockets.connection)
+
+WebSockets.connection(global.io)
 
 /** Listen on provided port, on all network interfaces. */
 server.listen(port);

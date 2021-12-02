@@ -22,6 +22,14 @@ export default {
         return res.status(500).json({ success: false, error: error })
       }
      },
+    onGetMyProfil: async (req, res) => {
+      try {
+        const user = await UserModel.getUserById(req.userId);
+        return res.status(200).json({ success: true, user });
+      } catch (error) {
+        return res.status(500).json({ success: false, error: error })
+      }
+    },
     onCreateUser: async (req, res) => {
       try {
         const validation = makeValidation(types => ({
@@ -42,8 +50,11 @@ export default {
         const hashedPassword = await bcrypt.hash(password, salt);
         const user = await UserModel.createUser(pseudo, email, hashedPassword, type);
 
+        delete user.password
+
         return res.status(200).json({ success: true, user });
       } catch (error) {
+        console.log(error);
         return res.status(500).json({ success: false, error: error })
       }
     },

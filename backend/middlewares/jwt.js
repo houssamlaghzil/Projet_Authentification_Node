@@ -21,12 +21,10 @@ export const encode = async (req, res, next) => {
 
     const authToken = jwt.sign(payload, process.env.JWTPRIVATEKEY);
 
-    console.log('Auth', authToken);
-
     delete user.password
-
+    
     req.authToken = authToken;
-    req.user = user
+    req.user = user;
     
     next();
   } catch (error) {
