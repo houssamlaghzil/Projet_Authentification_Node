@@ -7,6 +7,7 @@ export const authAdmin = (req, res, next) => {
   const accessToken = req.headers.authorization.split(' ')[1];
   try {
     const decoded = jwt.verify(accessToken, process.env.JWTPRIVATEKEY);
+    
     req.userId = decoded.userId;
     req.userType = decoded.userType;
     

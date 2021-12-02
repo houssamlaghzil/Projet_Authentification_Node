@@ -2,7 +2,7 @@ import express from 'express';
 // controllers
 import users from '../controllers/user.js';
 // middlewares
-import { encode } from '../middlewares/jwt.js';
+import { encode, decode } from '../middlewares/jwt.js';
 
 const router = express.Router();
 
@@ -17,5 +17,6 @@ router
       });
    })
   .post('/register', users.onCreateUser)
+  .post('/me', decode, users.onGetMyProfil)
 
 export default router;

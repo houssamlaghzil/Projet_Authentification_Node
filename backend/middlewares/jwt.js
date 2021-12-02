@@ -4,7 +4,6 @@ import UserModel from '../models/User.js';
 
 import bcrypt from 'bcrypt'
 
-
 export const encode = async (req, res, next) => {
   try {
     const { pseudo, password } = req.body;
@@ -22,12 +21,10 @@ export const encode = async (req, res, next) => {
 
     const authToken = jwt.sign(payload, process.env.JWTPRIVATEKEY);
 
-    console.log('Auth', authToken);
-
     delete user.password
-
+    
     req.authToken = authToken;
-    req.user = user
+    req.user = user;
     
     next();
   } catch (error) {
@@ -40,9 +37,12 @@ export const decode = (req, res, next) => {
   if (!req.headers['authorization']) {
     return res.status(400).json({ success: false, message: 'No access token provided' });
   }
+
   const accessToken = req.headers.authorization.split(' ')[1];
+
   try {
     const decoded = jwt.verify(accessToken, process.env.JWTPRIVATEKEY);
+    
     req.userId = decoded.userId;
     req.userType = decoded.type;
 

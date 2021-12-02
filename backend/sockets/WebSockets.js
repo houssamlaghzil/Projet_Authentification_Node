@@ -1,33 +1,46 @@
 class WebSockets {
     users = [];
     connection(client) {
+      console.log("Socket listening someone connect");
+
       client.on("disconnect", () => {
         this.users = this.users.filter((user) => user.socketId !== client.id);
+        console.log('Socket listening user disconnected');
       });
+
       client.on("identity", (userId) => {
         this.users.push({
           socketId: client.id,
           userId: userId,
         });
+
+        console.log('Socket listening identity connection');
       });
-      client.on("subscribe", (room, otherUserId = "") => {
-        this.subscribeOtherUser(room, otherUserId);
-        client.join(room);
+
+      client.on("subscribe", (chat, otherUserId = "") => {
+        this.subscribeOtherUser(chat, otherUserId);
+        client.join(chat);
+
+        console.log('Socket listening chatroom');
       });
-      client.on("unsubscribe", (room) => {
-        client.leave(room);
+
+      client.on("unsubscribe", (chat) => {
+        client.leave(chat);
+        console.log('Socket listening unsuscribe chatroom');
       });
     }
   
-    subscribeOtherUser(room, otherUserId) {
+    subscribeOtherUser(chat, otherUserId) {
       const userSockets = this.users.filter(
         (user) => user.userId === otherUserId
       );
       userSockets.map((userInfo) => {
         const socketConn = global.io.sockets.connected(userInfo.socketId);
+
         if (socketConn) {
-          socketConn.join(room);
+          socketConn.join(chat);
         }
+      
       });
     }
   }

@@ -1,3 +1,4 @@
+import { response } from "express";
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
@@ -30,7 +31,10 @@ userSchema.statics.createUser = async function (
   type
 ) {
   try {
-    const user = await this.create({ pseudo, email, password, type });
+    const user = await this.create({ pseudo, email, password, type })
+    
+    delete user.password;
+
     return user;
   } catch (error) {
     throw error;
@@ -39,7 +43,15 @@ userSchema.statics.createUser = async function (
 
 userSchema.statics.getUsers = async function () {
   try {
-    const users = await this.find();
+    const users = await this.find()
+    .lean()
+    .exec()
+    .then(
+      (result) => {
+        return result
+      }
+    );
+
     return users;
   } catch (error) {
     throw error;
@@ -48,8 +60,17 @@ userSchema.statics.getUsers = async function () {
 
 userSchema.statics.getUserById = async function (id) {
   try {
-    const user = await this.findOne({ _id: id });
+    const user = await this.findOne({ _id: id })
+    .lean()
+    .exec()
+    .then(
+      (result) => {
+        return result
+      }
+    );
+
     if (!user) throw ({ error: 'No user with this id found' });
+
     return user;
   } catch (error) {
     throw error;
@@ -58,8 +79,17 @@ userSchema.statics.getUserById = async function (id) {
 
 userSchema.statics.getUserByPseudo = async function (pseudo) {
   try {
-    const user = await this.findOne({ pseudo: pseudo });
+    const user = await this.findOne({ pseudo: pseudo })
+    .lean()
+    .exec()
+    .then(
+      (result) => {
+        return result
+      }
+    );
+
     if (!user) throw ({ error: 'No user with this pseudo found' });
+
     return user;
   } catch (error) {
     throw error;
@@ -78,6 +108,7 @@ userSchema.statics.updateUserById = async function (id, newUser) {
     });
 
     if (!user) throw ({ error: 'No user with this id found' });
+    
     return user;
   } catch (error) {
     throw error;
