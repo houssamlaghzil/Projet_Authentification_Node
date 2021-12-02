@@ -8,7 +8,7 @@ const halfmoon = require("halfmoon");
 export default function Login() {
     const history = useHistory();
 
-    const API_URL = "http://localhost:3000";
+    const API_URL = "http://localhost:3002";
 
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
