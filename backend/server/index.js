@@ -1,7 +1,6 @@
 import http from "http";
 import express from "express";
 import logger from "morgan";
-import cors from "cors";
 import { Server } from 'socket.io';
 
 // socket configuration
@@ -56,7 +55,9 @@ app.use('*', (req, res) => {
 /** Create HTTP server. */
 const server = http.createServer(app);
 
+/** Create socketio */
 const socketio = new Server(server);
+
 global.io = socketio.listen(server);
 global.io.on('connection', WebSockets.connection)
 

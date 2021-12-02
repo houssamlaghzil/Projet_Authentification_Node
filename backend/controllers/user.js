@@ -33,12 +33,15 @@ export default {
             type: { type: types.enum, options: { enum: USER_TYPES } },
           }
         }));
+
         if (!validation.success) return res.status(400).json(validation);
   
         const salt = await bcrypt.genSalt(10);
+
         const { pseudo, email, password, type } = req.body;
         const hashedPassword = await bcrypt.hash(password, salt);
         const user = await UserModel.createUser(pseudo, email, hashedPassword, type);
+
         return res.status(200).json({ success: true, user });
       } catch (error) {
         return res.status(500).json({ success: false, error: error })
@@ -53,6 +56,7 @@ export default {
           newUser.password = await bcrypt.hash(req.body.password, salt);
 
         const user = await UserModel.updateUserById(req.params.id, newUser);
+
         return res.status(200).json({ success: true, user });
       } catch (error) {
         return res.status(500).json({ success: false, error: error })
@@ -61,6 +65,7 @@ export default {
     onDeleteUserById: async (req, res) => {
       try {
         const user = await UserModel.deleteByUserById(req.params.id);
+        
         return res.status(200).json({ 
           success: true, 
           message: `Deleted a count of ${user.deletedCount} user.` 

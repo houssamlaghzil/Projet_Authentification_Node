@@ -4,16 +4,19 @@ class WebSockets {
       client.on("disconnect", () => {
         this.users = this.users.filter((user) => user.socketId !== client.id);
       });
+
       client.on("identity", (userId) => {
         this.users.push({
           socketId: client.id,
           userId: userId,
         });
       });
+
       client.on("subscribe", (chat, otherUserId = "") => {
         this.subscribeOtherUser(chat, otherUserId);
         client.join(chat);
       });
+
       client.on("unsubscribe", (chat) => {
         client.leave(chat);
       });
@@ -25,9 +28,11 @@ class WebSockets {
       );
       userSockets.map((userInfo) => {
         const socketConn = global.io.sockets.connected(userInfo.socketId);
+
         if (socketConn) {
           socketConn.join(chat);
         }
+      
       });
     }
   }
