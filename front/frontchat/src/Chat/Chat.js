@@ -1,6 +1,58 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
+import {useHistory} from "react-router-dom";
+import axios from "axios";
+import halfmoon from "halfmoon";
 
 export default function Chat() {
+
+    const history = useHistory();
+
+    const API_URL = "http://localhost:3002";
+
+    const [message, setMessage] = useState("");
+
+    const handleInitiate = (event) => {
+        let auth = localStorage.getItem("userAuthorization");
+        axios.post(API_URL+'/chat/initiate', {
+            userIds: [localStorage.getItem("userId")]
+        }, {
+            headers: {'Authorization': `Bearer ${auth}`}
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        if (message !== "" && message !== " ") {
+            let auth = localStorage.getItem("userAuthorization");
+
+            axios.post(API_URL+'/chat/'+localStorage.getItem("currentChatId")+'/message', {
+                messageText: message
+            }, {
+                headers: {'Authorization': `Bearer ${auth}`}
+            })
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    }
+
+    const handleLogout = (event) => {
+        event.preventDefault();
+
+        localStorage.clear();
+        history.push('/login');
+    }
+
     return(
         <>
         <head>
@@ -17,6 +69,15 @@ export default function Chat() {
 
             <div className="content">
                 <h2 className="content-title">
+                    Chat rooms
+                </h2>
+                <button onClick={handleInitiate} className="btn btn-primary" type="button">+</button>
+            </div>
+
+            <div className="sidebar-divider"/>
+
+            <div className="content">
+                <h2 className="content-title">
                     Chat
                 </h2>
                 <p>
@@ -24,7 +85,7 @@ export default function Chat() {
                 </p>
             </div>
 
-            <div className="sidebar-divider"></div>
+            <div className="sidebar-divider"/>
 
             <div className="content">
                 <h2 className="content-title">
@@ -49,7 +110,10 @@ export default function Chat() {
         </div>
 
         <nav className="navbar navbar-fixed-bottom">
-            <textarea className="form-control" placeholder="Enter your message here"></textarea>
+            <button onClick={handleLogout} className="btn btn-primary" type="button">Logout</button>
+            <textarea value={message}
+                      onChange={(e) => setMessage(e.target.value)} className="form-control" placeholder="Enter your message here"/>
+            <button onClick={handleSubmit} className="btn btn-primary" type="button">Send</button>
         </nav>
 
     </div>

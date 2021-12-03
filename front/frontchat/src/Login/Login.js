@@ -28,7 +28,20 @@ export default function Login() {
                 localStorage.setItem("userType", userData.type);
                 localStorage.setItem("userEmail", userData.email);
 
-                history.push('/chat');
+                let auth = localStorage.getItem("userAuthorization");
+                axios.post(API_URL+'/chat/initiate', {
+                    userIds: [localStorage.getItem("userId")]
+                }, {
+                    headers: {'Authorization': `Bearer ${auth}`}
+                })
+                    .then(function (response) {
+                        console.log(response);
+                        localStorage.setItem("currentChatId", response.data.chatRoom.chatId);
+                        history.push('/chat/');
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             })
             .catch(function (error) {
                 if (error.response === undefined) {
