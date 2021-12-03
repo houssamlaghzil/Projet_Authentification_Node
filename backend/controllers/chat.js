@@ -49,7 +49,7 @@ export default {
       const currentLoggedUser = req.userId;
       const post = await MessageModel.createPostInChat(chatId, messagePayload, currentLoggedUser);
 
-      global.io.sockets.to(chatId).emit('new message', { message: post.message.messageText });
+      global.io.sockets.to(chatId).emit('new message', { message: post });
 
       return res.status(200).json({ success: true, post });
     } catch (error) {
@@ -80,7 +80,7 @@ export default {
       const users = await UserModel.getUserByIds(chat.userIds);
       const options = {
         page: parseInt(req.query.page) || 0,
-        limit: parseInt(req.query.limit) || 10,
+        limit: parseInt(req.query.limit) || 50,
       };
 
       const conversation = await MessageModel.getConversationByChatId(chatId, options);
