@@ -49,7 +49,7 @@ export default {
       const currentLoggedUser = req.userId;
       const post = await MessageModel.createPostInChat(chatId, messagePayload, currentLoggedUser);
 
-      global.io.sockets.in(chatId).emit('new message', { message: post });
+      global.io.sockets.to(chatId).emit('new message', { message: post.message.messageText });
 
       return res.status(200).json({ success: true, post });
     } catch (error) {
