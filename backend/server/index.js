@@ -4,7 +4,7 @@ import logger from "morgan";
 import { Server } from 'socket.io';
 
 // socket configuration
-import WebSockets from "../sockets/WebSockets.js";
+import createSocket from '../sockets/SocketsIo.js'
 
 // mongo connection
 import "../config/mongo.js";
@@ -20,6 +20,8 @@ import { authAdmin } from '../middlewares/auth.js'
 
 import dotenv from 'dotenv'
 
+import cors from "cors";
+
 dotenv.config()
 
 const app = express();
@@ -30,9 +32,13 @@ app.set("port", port);
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token");
+  res.header("Access-Control-Request-Headers", "X-Requested-With, accept, content-type");
   next();
 });
+
+app.use(cors());
+app.options('*', cors());
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -54,11 +60,17 @@ app.use('*', (req, res) => {
 const server = http.createServer(app);
 
 /** Create socketio */
-const socketio = new Server(server);
+const socketio = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
+});
 
 global.io = socketio.listen(server);
-
-WebSockets.connection(global.io)
+global.io.on('connection', createSocket.connexion);
 
 /** Listen on provided port, on all network interfaces. */
 server.listen(port);

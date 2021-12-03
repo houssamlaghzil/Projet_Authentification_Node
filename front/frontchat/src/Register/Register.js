@@ -9,7 +9,7 @@ const halfmoon = require("halfmoon");
 export default function Register() {
     const history = useHistory();
 
-    const API_URL = "http://localhost:3000";
+    const API_URL = "http://localhost:3002";
 
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");

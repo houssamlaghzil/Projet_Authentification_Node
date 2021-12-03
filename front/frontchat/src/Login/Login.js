@@ -2,16 +2,28 @@ import React, {useEffect, useState} from "react";
 import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
 import logo from "../logo.svg";
+import { SocketClient } from '../SocketClient'
 
 const halfmoon = require("halfmoon");
+const socketClient = SocketClient();
 
 export default function Login() {
     const history = useHistory();
 
-    const API_URL = "http://localhost:3000";
+    const API_URL = "http://localhost:3002";
 
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
+    const [socket, setSocket] = useState(null);
+
+    useEffect(() => {
+        halfmoon.onDOMContentLoaded();
+        
+        if (!socket) {
+            setSocket(socketClient)
+        }
+
+    }, [socket]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -21,14 +33,21 @@ export default function Login() {
             password: password,
         })
             .then(function (response) {
-                let userData = response.data.user;
-                localStorage.setItem("userAuthorization", response.data.authorization);
-                localStorage.setItem("userId", userData._id);
-                localStorage.setItem("userName", userData.pseudo);
-                localStorage.setItem("userType", userData.type);
-                localStorage.setItem("userEmail", userData.email);
+                let user = response.data.user;
 
-                history.push('/chat');
+                socket.emit("identity", user._id);
+
+                const userDatas = {
+                    userId: user._id,
+                    pseudo: user.pseudo,
+                    email: user.email,
+                    role: user.type,
+                    authorization: response.data.authorization
+                }
+
+                localStorage.setItem("userDatas", JSON.stringify(userDatas));
+
+                history.push('/chat/e14dc67a556847faa504c5c077d303e4');
             })
             .catch(function (error) {
                 if (error.response === undefined) {
@@ -62,10 +81,6 @@ export default function Login() {
                 }
             });
     }
-
-    useEffect(() => {
-        halfmoon.onDOMContentLoaded();
-    });
 
     return(
         <>
