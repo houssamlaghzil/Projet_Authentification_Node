@@ -1,18 +1,34 @@
 import React, {useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
+import { SocketClient } from '../SocketClient'
 import axios from "axios";
-import halfmoon from "halfmoon";
+
+const socketClient = SocketClient();
 
 export default function Chat() {
+
+    const urlParamId = window.location.pathname.split('/chat/')
+    const chatId = urlParamId[1]
 
     const history = useHistory();
 
     const API_URL = "http://localhost:3002";
 
     const [message, setMessage] = useState("");
+    const [socket, setSocket] = useState(null);
+
+    useEffect(() => {        
+        if (!socket) {
+            setSocket(socketClient)
+        } else {
+            socket.emit("subscribe", chatId);
+        }
+
+    }, [socket, chatId]);
 
     const handleInitiate = (event) => {
-        let auth = localStorage.getItem("userAuthorization");
+        let auth = JSON.parse(localStorage.getItem("userDatas")).authorization;
+
         axios.post(API_URL+'/chat/initiate', {
             userIds: [localStorage.getItem("userId")]
         }, {
@@ -30,15 +46,19 @@ export default function Chat() {
         event.preventDefault();
 
         if (message !== "" && message !== " ") {
-            let auth = localStorage.getItem("userAuthorization");
+            let auth = JSON.parse(localStorage.getItem("userDatas")).authorization;
 
-            axios.post(API_URL+'/chat/'+localStorage.getItem("currentChatId")+'/message', {
+            axios.post(API_URL+'/chat/'+chatId+'/message', {
                 messageText: message
             }, {
                 headers: {'Authorization': `Bearer ${auth}`}
             })
                 .then(function (response) {
                     console.log(response);
+                    socket.on("new message", (data) => {
+                        console.log('New Message : ', data.message);
+                        //setMessage(data.message)
+                    });
                 })
                 .catch(function (error) {
                     console.log(error);
