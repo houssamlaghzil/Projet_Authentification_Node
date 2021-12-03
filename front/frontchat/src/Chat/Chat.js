@@ -9,7 +9,7 @@ export default function Chat() {
 
     const urlParamId = window.location.pathname.split('/chat/');
     const chatId = urlParamId[1];
-    const auth = JSON.parse(localStorage.getItem("userDatas")).authorization;
+    const auth = JSON.parse(localStorage.getItem("userDatas"));
 
     const history = useHistory();
 
@@ -18,51 +18,63 @@ export default function Chat() {
     const [messages, setMessagesList] = useState([]);
     const [message, setMessage] = useState("");
     const [socket, setSocket] = useState(null);
+    const [roomId, setRoomId] = useState(chatId);
 
     useEffect(() => {
         if (!socket) {
             setSocket(socketClient)
         } else {
-            socket.emit("subscribe", chatId);
+            socket.emit("subscribe", roomId);
         }
 
         async function getAllMessages() {
-            const response = await axios.get(API_URL + '/chat/' + chatId + '', {
-                headers: { 'Authorization': `Bearer ${auth}` }
+            const response = await axios.get(API_URL + '/chat/' + roomId + '', {
+                headers: { 'Authorization': `Bearer ${auth.authorization}` }
             })
 
             const conversationList = []
 
-            response.data.conversation.forEach(element => {
+            if(response.data.conversation.length > 0) {
+
+                response.data.conversation.forEach(element => {
+
+                    const newDate = new Date(element.createdAt)
+
+                    conversationList.push({
+                        user: element.postedByUser.pseudo,
+                        message: element.message.messageText,
+                        date: newDate.toLocaleString("fr-FR")
+                    })
+                });
+            } else {
                 conversationList.push({
-                    user: element.postedByUser.pseudo,
-                    message: element.message.messageText,
-                    date: element.createdAt
+                    user: 'Administrateur',
+                    message: 'Bienvenue sur le chat !',
+                    date: new Date().toLocaleString("fr-FR")
                 })
-            });
+            }
 
             setMessagesList(conversationList)
-
-            //console.log("Response : ", response.data.conversation);
         }
 
         if (messages.length === 0) {
             getAllMessages()
         }
 
-        //console.log('Messages : ', messages);
-
-    }, [socket, chatId, messages, auth]);
+    }, [socket, chatId, messages, auth, roomId]);
 
     const handleInitiate = (event) => {
 
         axios.post(API_URL + '/chat/initiate', {
-            userIds: [localStorage.getItem("userId")]
+            userIds: [auth.userId]
         }, {
-            headers: { 'Authorization': `Bearer ${auth}` }
+            headers: { 'Authorization': `Bearer ${auth.authorization}` }
         })
             .then(function (response) {
                 console.log(response);
+                setRoomId(response.data.chatRoom.chatId)
+                setMessagesList([])
+                history.push(`/chat/${response.data.chatRoom.chatId}`);
             })
             .catch(function (error) {
                 console.log(error);
@@ -77,10 +89,10 @@ export default function Chat() {
             axios.post(API_URL + '/chat/' + chatId + '/message', {
                 messageText: message
             }, {
-                headers: { 'Authorization': `Bearer ${auth}` }
+                headers: { 'Authorization': `Bearer ${auth.authorization}` }
             })
                 .then(function (response) {
-                    console.log(response);
+                    setMessage("")
                     socket.on("new message", (data) => {
                         setMessagesList([...messages, {
                             user: data.message.postedByUser.pseudo,
@@ -102,9 +114,29 @@ export default function Chat() {
         history.push('/login');
     }
 
-    const renderMessagesDiscussion = () => {
+    const renderChatRooms = async () => {
+        const allRooms = await axios.get(API_URL + '/chat', {
+            headers: { 'Authorization': `Bearer ${auth.authorization}` }
+        })
 
-        console.log(messages);
+        return allRooms.map((element, index) => {
+            return (
+                <>
+                <div className="sidebar-divider" />
+                    <div className="content">
+                        <h2 className="content-title">
+                            Chat {index + 1}
+                        </h2>
+                        <p>
+                            Salon {index + 1}
+                        </p>
+                    </div>
+                </>
+            )
+        })
+    }
+
+    const renderMessagesDiscussion = () => {
 
         return messages.map((element, index) => {
             return (
@@ -146,10 +178,10 @@ export default function Chat() {
 
                         <div className="content">
                             <h2 className="content-title">
-                                Chat
+                                Chat 2
                             </h2>
                             <p>
-                                Salut t po beau
+                                Salon 2
                             </p>
                         </div>
 
@@ -157,14 +189,14 @@ export default function Chat() {
 
                         <div className="content">
                             <h2 className="content-title">
-                                Chat
+                                Chat 3
                             </h2>
                             <p>
-                                Salut t po beau
+                                Salon 3
                             </p>
                         </div>
                     </div>
-                    <div className="content-wrapper">
+                    <div className="content-wrapper" style={{display: 'block'}}>
                         {renderMessagesDiscussion()}
                     </div>
 
