@@ -4,7 +4,7 @@ import logger from "morgan";
 import { Server } from 'socket.io';
 
 // socket configuration
-import WebSockets from "../sockets/WebSockets.js";
+import createSocket from '../sockets/SocketsIo.js'
 
 // mongo connection
 import "../config/mongo.js";
@@ -62,7 +62,7 @@ const server = http.createServer(app);
 /** Create socketio */
 const socketio = new Server(server, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true
@@ -70,8 +70,7 @@ const socketio = new Server(server, {
 });
 
 global.io = socketio.listen(server);
-
-global.io.on('connection', WebSockets.connection)
+global.io.on('connection', createSocket.connexion);
 
 /** Listen on provided port, on all network interfaces. */
 server.listen(port);

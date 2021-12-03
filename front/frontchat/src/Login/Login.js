@@ -2,9 +2,10 @@ import React, {useEffect, useState} from "react";
 import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
 import logo from "../logo.svg";
-import socketIOClient from "socket.io-client";
+import { SocketClient } from '../SocketClient'
 
 const halfmoon = require("halfmoon");
+const socketClient = SocketClient();
 
 export default function Login() {
     const history = useHistory();
@@ -13,6 +14,16 @@ export default function Login() {
 
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
+    const [socket, setSocket] = useState(null);
+
+    useEffect(() => {
+        halfmoon.onDOMContentLoaded();
+        
+        if (!socket) {
+            setSocket(socketClient)
+        }
+
+    }, [socket]);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -24,7 +35,6 @@ export default function Login() {
             .then(function (response) {
                 let user = response.data.user;
 
-                const socket = socketIOClient("http://localhost:3002");         
                 socket.emit("identity", user._id);
 
                 const userDatas = {
@@ -84,10 +94,6 @@ export default function Login() {
                 }
             });
     }
-
-    useEffect(() => {
-        halfmoon.onDOMContentLoaded();
-    });
 
     return(
         <>
